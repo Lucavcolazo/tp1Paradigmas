@@ -1,7 +1,7 @@
-using ElementalGame.AI;
-using ElementalGame.Models;
+using tp1Paradigmas.AI;
+using tp1Paradigmas.Models;
 
-namespace ElementalGame.Setup;
+namespace tp1Paradigmas.Setup;
 
 // Conoce los tipos de IA disponibles: el jugador elige uno o deja que se sortee.
 public class StrategySelector

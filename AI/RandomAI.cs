@@ -1,6 +1,6 @@
-using ElementalGame.Models;
+using tp1Paradigmas.Models;
 
-namespace ElementalGame.AI;
+namespace tp1Paradigmas.AI;
 
 // Elige al azar, sin mirar al rival.
 // [Polimorfismo] Implementa IStrategy directamente: no comparte lógica con las otras IAs,

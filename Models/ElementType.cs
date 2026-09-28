@@ -1,4 +1,4 @@
-namespace ElementalGame.Models;
+namespace tp1Paradigmas.Models;
 
 public enum ElementType
 {

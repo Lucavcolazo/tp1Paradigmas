@@ -1,6 +1,6 @@
-using ElementalGame.Models;
+using tp1Paradigmas.Models;
 
-namespace ElementalGame.AI;
+namespace tp1Paradigmas.AI;
 
 // Estrategia + eficiencia: si alguna unidad puede rematar al rival de un golpe, usa la que
 // lo logra con menos ventaja y menos energía, guardando las mejores para después.

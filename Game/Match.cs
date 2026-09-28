@@ -1,8 +1,8 @@
-using ElementalGame.Models;
-using ElementalGame.Players;
-using ElementalGame.UI;
+using tp1Paradigmas.Models;
+using tp1Paradigmas.Players;
+using tp1Paradigmas.UI;
 
-namespace ElementalGame.Game;
+namespace tp1Paradigmas.Game;
 
 public class Match
 {

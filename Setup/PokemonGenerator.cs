@@ -1,6 +1,6 @@
-using ElementalGame.Models;
+using tp1Paradigmas.Models;
 
-namespace ElementalGame.Setup;
+namespace tp1Paradigmas.Setup;
 
 public class PokemonGenerator
 {

@@ -1,7 +1,7 @@
-using ElementalGame.AI;
-using ElementalGame.Models;
+using tp1Paradigmas.AI;
+using tp1Paradigmas.Models;
 
-namespace ElementalGame.Players;
+namespace tp1Paradigmas.Players;
 
 // [Herencia] AIPlayer es un Player, igual que HumanPlayer.
 public class AIPlayer : Player

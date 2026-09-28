@@ -1,4 +1,4 @@
-namespace ElementalGame.Models;
+namespace tp1Paradigmas.Models;
 
 // Matriz de daño configurable: cambiar las reglas no afecta la lógica del juego.
 // [Abstracción] El resto del juego solo pregunta "¿cuánto daño le hace X a Y?" con GetDamage(),

@@ -1,4 +1,4 @@
-namespace ElementalGame.Models;
+namespace tp1Paradigmas.Models;
 
 // [Abstracción] Representa la idea general de una unidad de combate. Es abstracta, así que no se
 // puede instanciar directamente: solo existen unidades concretas (como Pokemon).

@@ -1,6 +1,6 @@
-using ElementalGame.Models;
+using tp1Paradigmas.Models;
 
-namespace ElementalGame.Players;
+namespace tp1Paradigmas.Players;
 
 // [Abstracción] Modela lo que todo jugador tiene en común (unidades, unidad activa, reemplazar a la caída)
 // y deja abstracto lo único que cambia: cómo elige cada uno su unidad.

@@ -1,10 +1,10 @@
 using System.Text;
-using ElementalGame.AI;
-using ElementalGame.Models;
-using ElementalGame.Players;
-using ElementalGame.Setup;
+using tp1Paradigmas.AI;
+using tp1Paradigmas.Models;
+using tp1Paradigmas.Players;
+using tp1Paradigmas.Setup;
 
-namespace ElementalGame.UI;
+namespace tp1Paradigmas.UI;
 
 // Todo lo que se muestra en la terminal (y lo que se lee del humano) pasa por acá.
 // Los textos que ve el jugador están en español.

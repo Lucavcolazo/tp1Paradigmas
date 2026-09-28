@@ -1,6 +1,6 @@
-using ElementalGame.Models;
+using tp1Paradigmas.Models;
 
-namespace ElementalGame.AI;
+namespace tp1Paradigmas.AI;
 
 // Elige la unidad con mejor balance entre daño infligido y daño recibido frente al rival.
 // [Polimorfismo] Implementa IStrategy.

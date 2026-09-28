@@ -1,10 +1,10 @@
-using ElementalGame.Game;
-using ElementalGame.Models;
-using ElementalGame.Players;
-using ElementalGame.Setup;
-using ElementalGame.UI;
+using tp1Paradigmas.Game;
+using tp1Paradigmas.Models;
+using tp1Paradigmas.Players;
+using tp1Paradigmas.Setup;
+using tp1Paradigmas.UI;
 
-namespace ElementalGame;
+namespace tp1Paradigmas;
 
 public class Program
 {
