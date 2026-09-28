@@ -1,22 +1,27 @@
-using JuegoElementos.IA;
-using JuegoElementos.Jugadores;
-using JuegoElementos.Modelo;
+using ElementalGame.Game;
+using ElementalGame.Models;
+using ElementalGame.Players;
+using ElementalGame.Setup;
+using ElementalGame.UI;
 
-namespace JuegoElementos;
+namespace ElementalGame;
 
 public class Program
 {
-    private const int CantidadDeUnidades = 5;
+    private const int UnitsPerPlayer = 5;
 
     public static void Main()
     {
-        var tabla = TablaEfectividad.PorDefecto();
-        var fabrica = new FabricaDePokemones();
-        var estrategia = new SelectorDeEstrategia(tabla).ElegirAlAzar();
+        var screen = new Screen();
+        var table = EffectivenessTable.CreateDefault();
+        var generator = new PokemonGenerator();
 
-        var humano = new JugadorHumano("Jugador", fabrica.Generar(CantidadDeUnidades));
-        var ia = new JugadorIA(estrategia, fabrica.Generar(CantidadDeUnidades));
+        screen.ShowWelcome();
+        var strategy = screen.AskForStrategy(new StrategySelector(table));
 
-        new Partida(humano, ia, tabla).Jugar();
+        var human = new HumanPlayer("Jugador", generator.Generate(UnitsPerPlayer), screen);
+        var ai = new AIPlayer(strategy, generator.Generate(UnitsPerPlayer));
+
+        new Match(human, ai, table, screen).Play();
     }
 }
