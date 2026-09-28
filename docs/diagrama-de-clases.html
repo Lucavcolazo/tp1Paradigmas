@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagrama de clases</title>
+<meta name="description" content="Diagrama de clases para presentar el juego Agua, Tierra y Fuego (tp1Paradigmas): qué le pide cada clase a otra y qué devuelve.">
+<style>
+  :root {
+    --ink: #111111;
+    --mid: #555555;
+    --soft: #8a8a8a;
+    --faint: #d9d9d9;
+    --paper: #ffffff;
+    --wash: #f3f3f3;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.45 "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+  code, .mono { font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 28px;
+    flex-wrap: wrap;
+    padding: 14px 24px;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; }
+  h1 span { font-weight: 400; color: var(--mid); }
+  .legend { display: flex; gap: 8px 22px; flex-wrap: wrap; align-items: center; font-size: 12.5px; color: var(--mid); }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+
+  .stage { position: relative; flex: 1; min-height: 0; }
+  #diagram { width: 100%; height: 100%; display: block; }
+
+  .caption {
+    border-top: 1.5px solid var(--ink);
+    padding: 12px 24px 14px;
+    display: flex;
+    gap: 12px 28px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .caption .text { flex: 1 1 560px; min-width: 0; }
+  .step-tag { font-size: 11.5px; text-transform: uppercase; letter-spacing: .09em; color: var(--mid); }
+  .step-title { font-size: 18px; font-weight: 700; margin: 1px 0 3px; }
+  .step-body { margin: 0; color: #222; max-width: 118ch; }
+  .step-body code { font-size: 13.5px; background: var(--wash); padding: 0 4px; border-radius: 3px; }
+  .nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .progress { display: flex; gap: 5px; margin-right: 6px; }
+  .progress i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--ink); }
+  .progress i.on { background: var(--ink); }
+
+  button {
+    font: inherit;
+    font-size: 14px;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    padding: 7px 14px;
+    min-height: 36px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--wash); }
+  button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  button:disabled { opacity: .3; cursor: default; background: var(--paper); }
+  button.primary { background: var(--ink); color: var(--paper); }
+  button.primary:hover { background: #333; }
+  .picker { gap: 0; }
+  .picker-label { font-size: 12px; color: var(--mid); text-transform: uppercase; letter-spacing: .08em; margin-right: 10px; }
+  .picker button { border-radius: 0; margin-left: -1.5px; }
+  .picker button:first-of-type { border-radius: 6px 0 0 6px; margin-left: 0; }
+  .picker button:last-of-type { border-radius: 0 6px 6px 0; }
+  .picker button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  /* ---------- SVG ---------- */
+  .box { cursor: pointer; transition: opacity .2s; }
+  .box rect { fill: var(--paper); stroke: var(--ink); stroke-width: 1.6; transition: fill .2s; }
+  .box:hover rect { stroke-width: 2.8; }
+  .box .name { font-size: 19px; font-weight: 700; fill: var(--ink); }
+  .box.abstract .name { font-style: italic; }
+  .box .stereo { font-size: 12.5px; fill: var(--mid); }
+  .box .role { font-size: 13px; fill: var(--mid); }
+  .box.sel rect { fill: var(--ink); }
+  .box.sel text { fill: var(--paper); }
+
+  .edge { transition: opacity .2s; }
+  .edge .line { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+  .edge.struct .line { stroke: var(--mid); }
+  .edge.realize .line, .edge.uses .line { stroke-dasharray: 7 5; }
+  .edge.on .line { stroke-width: 2.4; stroke: var(--ink); }
+  .dots {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 4.5;
+    stroke-linecap: round;
+    stroke-dasharray: 0 18;
+    animation: flow 1.1s linear infinite;
+  }
+  .edge.rev .dots { animation-direction: reverse; }
+  .edge.struct .dots { display: none; }
+  .edge.struct.anim .dots { display: inline; }
+  @keyframes flow { to { stroke-dashoffset: -18; } }
+
+  .lbl {
+    font-size: 13px;
+    fill: var(--ink);
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-width: 6px;
+    stroke-linejoin: round;
+  }
+  .lbl.ret { font-size: 12px; fill: var(--mid); opacity: 0; transition: opacity .2s; }
+  .edge.on .lbl.ret { opacity: 1; }
+  .lbl.msg { display: none; }
+  .edge.anim .lbl.msg { display: inline; }
+  .lbl.static { font-size: 12px; fill: var(--mid); }
+
+  svg.focus .box:not(.on) { opacity: .2; }
+  svg.focus .edge:not(.on) { opacity: .1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dots { animation: none; stroke-dasharray: none; stroke-width: 0; }
+  }
+
+  /* ---------- panel de clase ---------- */
+  .panel {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: min(380px, calc(100% - 28px));
+    max-height: calc(100% - 28px);
+    overflow: auto;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 16px 18px 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .14);
+    display: none;
+  }
+  .panel.open { display: block; }
+  .panel .kind { font-size: 12px; color: var(--mid); text-transform: uppercase; letter-spacing: .08em; }
+  .panel h2 { margin: 2px 0 2px; font-size: 22px; }
+  .panel .file { font-size: 12.5px; color: var(--mid); }
+  .panel .desc { margin: 8px 0 0; font-size: 14px; }
+  .panel h3 {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--mid);
+    margin: 14px 0 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--faint);
+  }
+  .panel ul { margin: 0; padding: 0; list-style: none; font-size: 13.5px; }
+  .panel li { margin: 0 0 8px; }
+  .panel li code { font-size: 12.5px; background: var(--wash); padding: 1px 4px; border-radius: 3px; overflow-wrap: anywhere; }
+  .panel .who { font-weight: 700; }
+  .panel .ret-txt { display: block; color: var(--mid); font-size: 12.5px; margin-top: 1px; }
+  .panel .none { color: var(--soft); }
+  .panel .close { position: absolute; top: 10px; right: 10px; padding: 3px 10px; min-height: 0; font-size: 13px; }
+
+  @media (max-width: 760px) {
+    body { height: auto; overflow: auto; }
+    .stage { flex: none; height: 62vh; }
+    header, .caption { padding: 12px 16px; }
+    .panel { position: fixed; top: auto; bottom: 12px; max-height: 60vh; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Diagrama de clases <span>· tp1Paradigmas</span></h1>
+  <div class="legend" aria-label="Referencias">
+    <span>
+      <svg width="46" height="12" viewBox="0 0 46 12" aria-hidden="true">
+        <path d="M2,6 L36,6" stroke="#111" stroke-width="1.6"/>
+        <path d="M2,6 L36,6" stroke="#111" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="0 12"/>
+        <path d="M34,1 L44,6 L34,11 z" fill="#111"/>
+      </svg>
+      Mensaje: una clase le pide algo a otra
+    </span>
+    <span>
+      <svg width="46" height="14" viewBox="0 0 46 14" aria-hidden="true">
+        <path d="M2,7 L33,7" stroke="#555" stroke-width="1.6"/>
+        <path d="M33,1 L44,7 L33,13 z" fill="#fff" stroke="#555" stroke-width="1.6"/>
+      </svg>
+      Hereda de
+    </span>
+    <span>
+      <svg width="46" height="14" viewBox="0 0 46 14" aria-hidden="true">
+        <path d="M2,7 L33,7" stroke="#555" stroke-width="1.6" stroke-dasharray="7 5"/>
+        <path d="M33,1 L44,7 L33,13 z" fill="#fff" stroke="#555" stroke-width="1.6"/>
+      </svg>
+      Implementa la interfaz
+    </span>
+    <span>
+      <svg width="46" height="12" viewBox="0 0 46 12" aria-hidden="true">
+        <path d="M2,6 L42,6" stroke="#555" stroke-width="1.6" stroke-dasharray="7 5"/>
+        <path d="M35,1 L43,6 L35,11" fill="none" stroke="#555" stroke-width="1.6"/>
+      </svg>
+      Usa
+    </span>
+  </div>
+</header>
+
+<div class="stage">
+  <svg id="diagram" viewBox="0 20 1910 1075" preserveAspectRatio="xMidYMid meet" role="img"
+       aria-label="Diagrama de clases del juego con los mensajes entre clases">
+    <defs>
+      <marker id="m-msg" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M1,1 L13,7 L1,13 z" fill="#111"/>
+      </marker>
+      <marker id="m-tri" markerWidth="16" markerHeight="16" refX="14" refY="8" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M1,1 L15,8 L1,15 z" fill="#fff" stroke="#555" stroke-width="1.6" stroke-linejoin="round"/>
+      </marker>
+      <marker id="m-open" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M1,1 L11,6 L1,11" fill="none" stroke="#555" stroke-width="1.6"/>
+      </marker>
+    </defs>
+    <g id="edges"></g>
+    <g id="boxes"></g>
+  </svg>
+
+  <aside class="panel" id="panel" aria-live="polite">
+    <button type="button" class="close" id="closePanel">Cerrar</button>
+    <div id="panelBody"></div>
+  </aside>
+</div>
+
+<footer class="caption">
+  <div class="text">
+    <div class="step-tag" id="stepTag"></div>
+    <div class="step-title" id="stepTitle"></div>
+    <p class="step-body" id="stepBody"></p>
+  </div>
+  <div class="nav picker" id="aiPicker" role="group" aria-label="IA rival">
+    <span class="picker-label">IA rival</span>
+    <button type="button" data-ai="RandomAI" aria-pressed="false">IA Aleatoria</button>
+    <button type="button" data-ai="StrategicAI" aria-pressed="false">IA Estratégica</button>
+    <button type="button" data-ai="SuperAI" aria-pressed="true">Super IA</button>
+  </div>
+  <div class="nav">
+    <div class="progress" id="progress" aria-hidden="true"></div>
+    <button type="button" id="prev">‹ Anterior</button>
+    <button type="button" class="primary" id="next">Siguiente ›</button>
+    <button type="button" id="overview">Vista general</button>
+    <button type="button" id="fullscreen">Pantalla completa</button>
+  </div>
+</footer>
+
+<script>
+/* ------------------------------------------------------------------
+   Clases (sin atributos): posición, rol y qué reciben al crearse.
+------------------------------------------------------------------- */
+const BOX_H = 84;
+
+const CLASSES = {
+  Program: { x: 40, y: 380, w: 200, role: 'Arma todo y arranca', file: 'Program.cs', kind: 'Clase',
+    desc: 'Punto de entrada. Crea todos los objetos del juego, los conecta entre sí y arranca la partida.',
+    ctor: 'Nada: el programa empieza en su método estático Main().' },
+  Screen: { x: 640, y: 60, w: 220, role: 'Muestra y lee la consola', file: 'UI/Screen.cs', kind: 'Clase',
+    desc: 'Todo lo que se ve y se escribe en la terminal. Ninguna otra clase usa la consola.',
+    ctor: 'Nada.',
+    outExtra: [['Player / ElementalUnit', 'lee Name, Energy, IsKnockedOut', 'los datos que dibuja en pantalla']] },
+  StrategySelector: { x: 300, y: 200, w: 200, role: 'Entrega la IA elegida', file: 'Setup/StrategySelector.cs', kind: 'Clase',
+    desc: 'Conoce las tres IAs disponibles. Le da la lista al menú o sortea una.',
+    ctor: 'table: EffectivenessTable (se la pasa a las IAs que la necesitan).' },
+  PokemonGenerator: { x: 300, y: 620, w: 200, role: 'Reparte elementos al azar', file: 'Setup/PokemonGenerator.cs', kind: 'Clase',
+    desc: 'Crea las unidades de cada jugador con un tipo aleatorio y un id consecutivo.',
+    ctor: 'Nada.' },
+  Match: { x: 640, y: 380, w: 220, role: 'Maneja las rondas', file: 'Game/Match.cs', kind: 'Clase',
+    desc: 'El bucle de la partida: prepara unidades, ordena los ataques, detecta al ganador y le avisa a la pantalla.',
+    ctor: 'human: Player, ai: Player, table: EffectivenessTable, screen: Screen.' },
+  Player: { x: 1010, y: 380, w: 210, stereo: 'abstract', role: 'Unidades y reemplazos', file: 'Players/Player.cs', kind: 'Clase abstracta',
+    desc: 'Lo común a todo jugador: sus unidades, la unidad activa y reemplazarla cuando cae. Cómo elegir lo decide cada subclase.',
+    ctor: 'name: string, units: lista de ElementalUnit.',
+    outExtra: [['HumanPlayer / AIPlayer', 'ChooseUnit(available, rival)', 'la unidad elegida (se ejecuta la versión de la subclase real)']] },
+  HumanPlayer: { x: 900, y: 560, w: 200, role: 'Elige por pantalla', file: 'Players/HumanPlayer.cs', kind: 'Clase',
+    desc: 'El jugador humano. Para elegir unidad le pregunta al usuario a través de Screen.',
+    ctor: 'name, units y screen: Screen.',
+    inExtra: [['Player', 'ChooseUnit(available, rival)', 'la unidad que eligió el usuario']] },
+  AIPlayer: { x: 1130, y: 560, w: 200, role: 'Elige con su estrategia', file: 'Players/AIPlayer.cs', kind: 'Clase',
+    desc: 'El jugador máquina. No sabe qué IA tiene: le delega la elección a su IStrategy.',
+    ctor: 'strategy: IStrategy y units. Su nombre es el de la estrategia.',
+    inExtra: [['Player', 'ChooseUnit(available, rival)', 'la unidad que eligió su estrategia']] },
+  IStrategy: { x: 1540, y: 560, w: 220, stereo: 'interface', role: 'Contrato de toda IA', file: 'AI/IStrategy.cs', kind: 'Interfaz',
+    desc: 'Define qué tiene que saber hacer cualquier IA: Name, Description y Choose(). No tiene código propio.',
+    ctor: 'No se crea: es una interfaz.',
+    outExtra: [['RandomAI / StrategicAI / SuperAI', 'Choose(available, rival)', 'lo resuelve la IA real (polimorfismo)']] },
+  RandomAI: { x: 1430, y: 760, w: 200, role: 'Elige al azar', file: 'AI/RandomAI.cs', kind: 'Clase',
+    desc: 'Devuelve una unidad cualquiera. No mira al rival ni la tabla.',
+    ctor: 'Nada.',
+    inExtra: [['AIPlayer (vía IStrategy)', 'Choose(available, rival)', 'una unidad al azar']] },
+  StrategicAI: { x: 1670, y: 760, w: 200, role: 'Mayor ventaja de tipo', file: 'AI/StrategicAI.cs', kind: 'Clase',
+    desc: 'Elige la unidad con mejor balance entre daño que hace y daño que recibe. Si empatan, la de más energía.',
+    ctor: 'table: EffectivenessTable.',
+    inExtra: [
+      ['AIPlayer (vía IStrategy)', 'Choose(available, rival)', 'la unidad con mayor ventaja'],
+      ['SuperAI', 'base.Choose(available, rival)', 'la unidad con mayor ventaja (cuando SuperAI no puede rematar)'],
+    ] },
+  SuperAI: { x: 1670, y: 940, w: 200, role: 'Remata con lo justo', file: 'AI/SuperAI.cs', kind: 'Clase',
+    desc: 'Si alguna unidad remata al rival de un golpe, usa la que lo hace con menos daño. Si no, piensa como StrategicAI.',
+    ctor: 'table: EffectivenessTable (se la pasa a StrategicAI con base(table)).',
+    inExtra: [['AIPlayer (vía IStrategy)', 'Choose(available, rival)', 'la que remata con lo justo, o la de mayor ventaja']],
+    outExtra: [['StrategicAI', 'base.Choose(available, rival)', 'solo si ninguna unidad remata']] },
+  ElementalUnit: { x: 640, y: 720, w: 220, stereo: 'abstract', role: 'Energía, ataque y daño', file: 'Models/ElementalUnit.cs', kind: 'Clase abstracta',
+    desc: 'Una unidad de combate: tipo, energía (100 al empezar) y la capacidad de atacar y recibir daño.',
+    ctor: 'id: int, type: ElementType.',
+    outExtra: [['la unidad defensora', 'TakeDamage(daño)', 'nada: baja su energía sin pasar de 0']] },
+  Pokemon: { x: 640, y: 920, w: 220, role: 'La unidad concreta', file: 'Models/Pokemon.cs', kind: 'Clase',
+    desc: 'La unidad que realmente se crea. Hereda todo de ElementalUnit.',
+    ctor: 'id: int, type: ElementType.' },
+  ElementType: { x: 900, y: 920, w: 180, stereo: 'enum', role: 'Water · Earth · Fire', file: 'Models/ElementType.cs', kind: 'Enumeración',
+    desc: 'Los tres tipos de elemento.',
+    ctor: 'No se crea: son valores fijos.' },
+  EffectivenessTable: { x: 1120, y: 920, w: 220, role: 'Calcula el daño', file: 'Models/EffectivenessTable.cs', kind: 'Clase',
+    desc: 'La matriz de daño: para cada par (atacante, defensor) guarda cuánto daño se hace. Evita los if/switch entre tipos.',
+    ctor: 'Nada: CreateDefault() la crea y carga las 9 reglas.' },
+};
+
+/* ------------------------------------------------------------------
+   Mensajes: quién le pide qué a quién, y qué devuelve.
+   fs/ts: lado de salida/llegada; ft/tt: posición 0..1 sobre ese lado.
+   lab: [x, y, anchor] del texto; retAt: [x, y] opcional para "devuelve".
+------------------------------------------------------------------- */
+const FLOWS = [
+  { id: 'p-table', from: 'Program', fs: 'bottom', ft: .3, to: 'EffectivenessTable', ts: 'bottom',
+    send: 'CreateDefault()', ret: 'la tabla con las 9 reglas', lab: [560, 1036, 'middle'],
+    via: (a, b) => [{ x: a.x, y: 1060 }, { x: b.x, y: 1060 }] },
+  { id: 'p-screen', from: 'Program', fs: 'top', to: 'Screen', ts: 'left',
+    send: 'ShowWelcome() · AskForStrategy(selector)', ret: 'la IStrategy elegida', lab: [390, 76, 'middle'] },
+  { id: 'screen-sel', from: 'Screen', fs: 'bottom', ft: .2, to: 'StrategySelector', ts: 'right',
+    send: 'Strategies · PickRandom()', ret: 'la lista de IAs, o una al azar', lab: [514, 264, 'start'] },
+  { id: 'p-sel', from: 'Program', fs: 'right', ft: .2, to: 'StrategySelector', ts: 'left', tourOnly: true,
+    send: 'new StrategySelector(table)', ret: null, lab: [262, 330, 'end'] },
+  { id: 'p-gen', from: 'Program', fs: 'bottom', ft: .6, to: 'PokemonGenerator', ts: 'left',
+    send: 'Generate(5)  (dos veces)', ret: 'List<ElementalUnit>', lab: [172, 560, 'start'] },
+  { id: 'gen-poke', from: 'PokemonGenerator', fs: 'right', to: 'Pokemon', ts: 'left',
+    send: 'new Pokemon(id, tipo)', ret: null, lab: [582, 826, 'start'] },
+  { id: 'p-match', from: 'Program', fs: 'right', to: 'Match', ts: 'left',
+    send: 'new Match(...) · Play()', ret: null, lab: [440, 410, 'middle'] },
+  { id: 'm-screen', from: 'Match', fs: 'top', to: 'Screen', ts: 'bottom',
+    send: 'ShowAttack() · ShowSummary() · ShowResult()', ret: 'nada: solo muestra', lab: [740, 300, 'end'] },
+  { id: 'm-player', from: 'Match', fs: 'right', to: 'Player', ts: 'left',
+    send: 'PrepareUnit(rival)', ret: 'nada (void); deja lista su ActiveUnit', retShort: 'devuelve: nada', lab: [935, 410, 'middle'], retAt: [935, 444] },
+  { id: 'h-screen', from: 'HumanPlayer', fs: 'left', to: 'Screen', ts: 'right',
+    send: 'AskForUnit(available, rival)', ret: 'la unidad que eligió el usuario', lab: [892, 250, 'start'],
+    via: (a, b) => [{ x: 880, y: a.y }, { x: 880, y: b.y }] },
+  { id: 'ai-strat', from: 'AIPlayer', fs: 'right', to: 'IStrategy', ts: 'left',
+    send: 'Choose(available, rival)', ret: 'la ElementalUnit elegida', retShort: 'devuelve: la unidad elegida', lab: [1435, 590, 'middle'], retAt: [1435, 624] },
+  { id: 'st-table', from: 'StrategicAI', fs: 'left', ft: .8, to: 'EffectivenessTable', ts: 'right',
+    send: 'GetDamage(propia, rival)', ret: 'cuánto daño hace (double)', lab: [1495, 952, 'middle'], retAt: [1495, 984],
+    via: (a, b) => [{ x: 1650, y: a.y }, { x: 1650, y: b.y }] },
+  { id: 'm-unit', from: 'Match', fs: 'bottom', to: 'ElementalUnit', ts: 'top',
+    send: 'Attack(defender, table)', ret: 'el daño que hizo realmente', lab: [740, 600, 'end'] },
+  { id: 'u-table', from: 'ElementalUnit', fs: 'right', to: 'EffectivenessTable', ts: 'top', tt: .2,
+    send: 'GetDamage(atacante, defensor)', ret: 'el daño de la regla (double)', retShort: 'devuelve: el daño', lab: [1012, 732, 'middle'], retAt: [1012, 748] },
+];
+
+/* Estructura (UML). msg: el mensaje que viaja por esa línea cuando se anima en el recorrido. */
+const STRUCTS = [
+  { id: 's-human', kind: 'inherit', from: 'HumanPlayer', fs: 'top', to: 'Player', ts: 'bottom',
+    msg: 'ChooseUnit()', rev: true, lab: [990, 540, 'end'] },
+  { id: 's-ai', kind: 'inherit', from: 'AIPlayer', fs: 'top', to: 'Player', ts: 'bottom',
+    msg: 'ChooseUnit()', rev: true, lab: [1240, 540, 'start'] },
+  { id: 's-random', kind: 'realize', from: 'RandomAI', fs: 'top', to: 'IStrategy', ts: 'bottom',
+    msg: 'Choose()', rev: true, lab: [1520, 736, 'end'] },
+  { id: 's-strategic', kind: 'realize', from: 'StrategicAI', fs: 'top', to: 'IStrategy', ts: 'bottom',
+    msg: 'Choose()', rev: true, lab: [1780, 736, 'start'] },
+  { id: 's-super', kind: 'inherit', from: 'SuperAI', fs: 'top', to: 'StrategicAI', ts: 'bottom',
+    msg: 'base.Choose()  si no remata', rev: false, lab: [1780, 898, 'start'] },
+  { id: 's-pokemon', kind: 'inherit', from: 'Pokemon', fs: 'top', to: 'ElementalUnit', ts: 'bottom' },
+  { id: 's-type', kind: 'uses', from: 'ElementalUnit', fs: 'right', ft: .8, to: 'ElementType', ts: 'top', tt: .5,
+    staticLabel: 'Type', lab: [930, 781, 'middle'] },
+  { id: 's-table-type', kind: 'uses', from: 'EffectivenessTable', fs: 'left', to: 'ElementType', ts: 'right' },
+];
+
+/* ------------------------------------------------------------------
+   Recorrido de una partida, paso a paso.
+------------------------------------------------------------------- */
+const AI_OPTIONS = {
+  RandomAI:    { name: 'IA Aleatoria' },
+  StrategicAI: { name: 'IA Estratégica' },
+  SuperAI:     { name: 'Super IA' },
+};
+let chosenAI = 'SuperAI';
+
+// Los pasos en los que la IA piensa dependen de cuál se eligió en el menú.
+function aiSteps(ai) {
+  const intro = 'AIPlayer le pide <code>Choose(available, rival)</code> a su <code>IStrategy</code>, sin saber qué IA hay adentro.';
+  const steps = {
+    RandomAI: [{ key: 'ai', title: 'La IA elige: IA Aleatoria',
+      body: `${intro} El objeto real es un <code>RandomAI</code>: sortea una de las unidades vivas sin mirar al rival ni consultar la tabla, y la devuelve.`,
+      classes: ['AIPlayer', 'IStrategy', 'RandomAI'], flows: ['ai-strat'],
+      structs: ['s-random'], anim: ['s-random'] }],
+    StrategicAI: [{ key: 'ai', title: 'La IA elige: IA Estratégica',
+      body: `${intro} El objeto real es un <code>StrategicAI</code>: para cada unidad le pide a la tabla <code>GetDamage()</code> cuánto hace y cuánto recibe, calcula la ventaja (hace − recibe) y devuelve la de mayor ventaja. Si empatan, la de más energía.`,
+      classes: ['AIPlayer', 'IStrategy', 'StrategicAI', 'EffectivenessTable'], flows: ['ai-strat', 'st-table'],
+      structs: ['s-strategic'], anim: ['s-strategic'] }],
+    SuperAI: [
+      { key: 'ai', title: 'La IA elige: Super IA intenta rematar',
+        body: `${intro} El objeto real es un <code>SuperAI</code>: como hereda de StrategicAI, también es una IStrategy, pero corre <b>su propio</b> <code>Choose()</code> (override). Con <code>DamageDealt()</code>, heredado de StrategicAI, le pregunta a la tabla cuánto le hace cada unidad al rival. Si alguna lo remata de un golpe, devuelve la que lo hace con lo justo.`,
+        classes: ['AIPlayer', 'IStrategy', 'StrategicAI', 'SuperAI', 'EffectivenessTable'], flows: ['ai-strat', 'st-table'],
+        structs: ['s-strategic', 's-super'],
+        anim: [{ id: 's-strategic', msg: 'Choose()' }, { id: 's-super', msg: 'override Choose()', rev: true }] },
+      { key: 'ai-2', title: 'Super IA: si no puede rematar',
+        body: 'Si ninguna unidad remata, <code>finisher</code> queda en <code>null</code> y SuperAI llama a <code>base.Choose()</code>: se ejecuta el Choose() de su padre, StrategicAI, que consulta la tabla y elige por mayor ventaja. SuperAI devuelve esa unidad a AIPlayer.',
+        classes: ['AIPlayer', 'SuperAI', 'StrategicAI', 'EffectivenessTable'], flows: ['st-table'],
+        structs: ['s-super'], anim: [{ id: 's-super', msg: 'base.Choose()', rev: false }] },
+    ],
+  };
+  return steps[ai];
+}
+
+function buildSteps(ai) {
+  const aiName = AI_OPTIONS[ai].name;
+  return [
+    { key: 'overview', title: 'Vista general',
+      body: 'Cada flecha con puntos en movimiento es un <b>mensaje</b>: una clase le pide algo a otra llamando a un método. Hacé clic en una clase para ver qué recibe, qué pide y qué devuelve. Elegí la IA rival y usá <b>Siguiente</b> (o la flecha derecha del teclado) para recorrer una partida.',
+      all: true },
+    { key: 'start', title: 'Arranca el programa',
+      body: '<code>Program.Main()</code> le pide a <code>EffectivenessTable.CreateDefault()</code> la tabla de daño. Recibe la tabla ya cargada con las 9 reglas (por ejemplo, Agua le hace 50% a Fuego).',
+      classes: ['Program', 'EffectivenessTable'], flows: ['p-table'] },
+    { key: 'menu', title: 'Elegir el rival',
+      body: `Program crea el <code>StrategySelector</code> y le pide a <code>Screen</code> que muestre el menú con <code>AskForStrategy()</code>. Screen le pide a StrategySelector la lista de IAs (<code>Strategies</code>, o <code>PickRandom()</code> si se elige Sorpresa). En el menú se eligió <b>${aiName}</b>: Screen le devuelve a Program ese objeto <code>${ai}</code>, visto como <code>IStrategy</code>.`,
+      classes: ['Program', 'Screen', 'StrategySelector', 'IStrategy', ai], flows: ['p-sel', 'p-screen', 'screen-sel'] },
+    { key: 'deal', title: 'Repartir los elementos',
+      body: 'Program llama dos veces a <code>Generate(5)</code>, una por jugador. PokemonGenerator crea cada <code>Pokemon</code> con un tipo al azar y devuelve la lista como <code>List&lt;ElementalUnit&gt;</code>: el resto del juego solo conoce el tipo base.',
+      classes: ['Program', 'PokemonGenerator', 'Pokemon', 'ElementalUnit'], flows: ['p-gen', 'gen-poke'], structs: ['s-pokemon'] },
+    { key: 'players', title: 'Crear jugadores y partida',
+      body: `Con esas listas, Program crea <code>HumanPlayer</code> (con la Screen) y <code>AIPlayer</code> (con la ${aiName} como su IStrategy). Después crea <code>Match</code>, le pasa los dos jugadores, la tabla y la pantalla, y llama a <code>Play()</code>.`,
+      classes: ['Program', 'HumanPlayer', 'AIPlayer', 'Match'], flows: ['p-match'] },
+    { key: 'prepare', title: 'Cada ronda: preparar unidades',
+      body: 'Match le pide a cada jugador <code>PrepareUnit(rival)</code>. Si su unidad murió, <code>Player</code> llama a <code>ChooseUnit()</code> sin saber quién es: se ejecuta la versión de HumanPlayer o la de AIPlayer según el objeto real. Eso es <b>polimorfismo</b>.',
+      classes: ['Match', 'Player', 'HumanPlayer', 'AIPlayer'], flows: ['m-player'], structs: ['s-human', 's-ai'], anim: ['s-human', 's-ai'] },
+    { key: 'human', title: 'El humano elige',
+      body: 'HumanPlayer le pide a Screen <code>AskForUnit(available, rival)</code>: se muestran las unidades vivas, el usuario escribe un número y Screen devuelve la unidad elegida.',
+      classes: ['HumanPlayer', 'Screen'], flows: ['h-screen'] },
+    ...aiSteps(ai),
+    { key: 'attack', title: 'El ataque',
+      body: 'Match le pide a la unidad atacante <code>Attack(defender, table)</code>. La unidad le pide a la tabla <code>GetDamage(su tipo, tipo del defensor)</code>, llama a <code>defender.TakeDamage(daño)</code> y le devuelve a Match cuánta energía le sacó realmente.',
+      classes: ['Match', 'ElementalUnit', 'EffectivenessTable', 'ElementType'], flows: ['m-unit', 'u-table'], structs: ['s-type', 's-table-type'] },
+    { key: 'end', title: 'Mostrar y terminar',
+      body: 'Match le pasa a Screen lo que pasó: <code>ShowAttack()</code>, <code>ShowSummary()</code> y <code>ShowStatus()</code>. Repite las rondas mientras los dos jugadores tengan unidades vivas y al final llama a <code>ShowResult(ganador)</code>.',
+      classes: ['Match', 'Screen'], flows: ['m-screen'] },
+  ];
+}
+let STEPS = buildSteps(chosenAI);
+
+/* ------------------------------------------------------------------ */
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('diagram');
+const edgesLayer = document.getElementById('edges');
+const boxesLayer = document.getElementById('boxes');
+const G = {};
+const boxEls = {};
+const edgeEls = {};
+let step = 0;
+let selected = null;
+
+function svgEl(tag, attrs = {}, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+/* ---------- cajas ---------- */
+for (const [id, c] of Object.entries(CLASSES)) {
+  G[id] = { x: c.x, y: c.y, w: c.w, h: BOX_H };
+  const g = svgEl('g', { class: 'box' + (c.stereo === 'abstract' || c.stereo === 'interface' ? ' abstract' : ''), tabindex: 0, role: 'button', 'aria-label': `Clase ${id}` });
+  g.append(svgEl('rect', { x: c.x, y: c.y, width: c.w, height: BOX_H, rx: 6 }));
+  const cx = c.x + c.w / 2;
+  if (c.stereo) {
+    g.append(svgEl('text', { x: cx, y: c.y + 22, 'text-anchor': 'middle', class: 'stereo' }, `«${c.stereo}»`));
+    g.append(svgEl('text', { x: cx, y: c.y + 47, 'text-anchor': 'middle', class: 'name' }, id));
+    g.append(svgEl('text', { x: cx, y: c.y + 69, 'text-anchor': 'middle', class: 'role' }, c.role));
+  } else {
+    g.append(svgEl('text', { x: cx, y: c.y + 38, 'text-anchor': 'middle', class: 'name' }, id));
+    g.append(svgEl('text', { x: cx, y: c.y + 62, 'text-anchor': 'middle', class: 'role' }, c.role));
+  }
+  g.addEventListener('click', () => selectClass(id));
+  g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectClass(id); } });
+  boxesLayer.append(g);
+  boxEls[id] = g;
+}
+
+/* ---------- líneas ---------- */
+function anchor(g, side, t = .5) {
+  return {
+    top:    { x: g.x + g.w * t, y: g.y },
+    bottom: { x: g.x + g.w * t, y: g.y + g.h },
+    left:   { x: g.x, y: g.y + g.h * t },
+    right:  { x: g.x + g.w, y: g.y + g.h * t },
+  }[side];
+}
+
+function route(e, a, b) {
+  if (e.via) return [a, ...e.via(a, b), b];
+  const vertical = s => s === 'top' || s === 'bottom';
+  if (vertical(e.fs) && vertical(e.ts)) {
+    const y = (a.y + b.y) / 2;
+    return [a, { x: a.x, y }, { x: b.x, y }, b];
+  }
+  if (!vertical(e.fs) && !vertical(e.ts)) {
+    const x = (a.x + b.x) / 2;
+    return [a, { x, y: a.y }, { x, y: b.y }, b];
+  }
+  return vertical(e.fs) ? [a, { x: a.x, y: b.y }, b] : [a, { x: b.x, y: a.y }, b];
+}
+
+function pathFrom(points, radius = 10) {
+  const pts = points.filter((p, i) => i === 0 || Math.hypot(p.x - points[i - 1].x, p.y - points[i - 1].y) > .5);
+  let d = `M${pts[0].x},${pts[0].y}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1], p = pts[i], p1 = pts[i + 1];
+    const d0 = Math.hypot(p.x - p0.x, p.y - p0.y), d1 = Math.hypot(p1.x - p.x, p1.y - p.y);
+    const r = Math.min(radius, d0 / 2, d1 / 2);
+    const s = { x: p.x - (p.x - p0.x) / d0 * r, y: p.y - (p.y - p0.y) / d0 * r };
+    const t = { x: p.x + (p1.x - p.x) / d1 * r, y: p.y + (p1.y - p.y) / d1 * r };
+    d += ` L${s.x},${s.y} Q${p.x},${p.y} ${t.x},${t.y}`;
+  }
+  const last = pts[pts.length - 1];
+  return d + ` L${last.x},${last.y}`;
+}
+
+function label(g, e, text, cls, at) {
+  const [x, y, anchorPos = 'middle'] = at;
+  g.append(svgEl('text', { x, y, 'text-anchor': anchorPos, class: 'lbl ' + cls }, text));
+}
+
+function drawEdge(e, type) {
+  const a = anchor(G[e.from], e.fs, e.ft ?? .5);
+  const b = anchor(G[e.to], e.ts, e.tt ?? .5);
+  const d = pathFrom(route(e, a, b));
+  const cls = type === 'flow' ? 'edge flow' : `edge struct ${e.kind}`;
+  const g = svgEl('g', { class: cls + (e.rev ? ' rev' : '') });
+  const marker = type === 'flow' ? 'm-msg' : e.kind === 'uses' ? 'm-open' : 'm-tri';
+  g.append(svgEl('path', { class: 'line', d, 'marker-end': `url(#${marker})` }));
+  g.append(svgEl('path', { class: 'dots', d }));
+  if (type === 'flow') {
+    label(g, e, e.send, 'mono', e.lab);
+    if (e.ret) label(g, e, e.retShort ?? `devuelve: ${e.ret}`, 'ret', e.retAt ? [...e.retAt, e.lab[2]] : [e.lab[0], e.lab[1] + 16, e.lab[2]]);
+  } else if (e.msg) {
+    label(g, e, e.msg, 'msg mono', e.lab);
+  } else if (e.staticLabel) {
+    label(g, e, e.staticLabel, 'static mono', e.lab);
+  }
+  edgesLayer.append(g);
+  edgeEls[e.id] = g;
+}
+STRUCTS.forEach(s => drawEdge(s, 'struct'));
+FLOWS.forEach(f => drawEdge(f, 'flow'));
+
+/* ---------- resaltado ---------- */
+function focus({ classes = [], flows = [], structs = [], anim = [], sel = null, all = false }) {
+  svg.classList.toggle('focus', !all);
+  for (const [id, el] of Object.entries(boxEls)) {
+    el.classList.toggle('on', all || classes.includes(id));
+    el.classList.toggle('sel', id === sel);
+  }
+  for (const f of FLOWS) {
+    const el = edgeEls[f.id];
+    el.style.display = all && f.tourOnly ? 'none' : '';
+    el.classList.toggle('on', !all && flows.includes(f.id));
+  }
+  const animById = Object.fromEntries(anim.map(a => typeof a === 'string' ? [a, {}] : [a.id, a]));
+  for (const s of STRUCTS) {
+    const el = edgeEls[s.id];
+    const a = animById[s.id];
+    el.classList.toggle('on', all || structs.includes(s.id));
+    el.classList.toggle('anim', !!a);
+    el.classList.toggle('rev', a && a.rev !== undefined ? a.rev : !!s.rev);
+    const msg = el.querySelector('.lbl.msg');
+    if (msg) msg.textContent = (a && a.msg) || s.msg;
+  }
+}
+
+/* ---------- recorrido ---------- */
+const progress = document.getElementById('progress');
+function buildProgress() {
+  progress.innerHTML = '';
+  STEPS.forEach(() => progress.append(document.createElement('i')));
+}
+buildProgress();
+
+// Cambia la IA del recorrido y se queda en el paso equivalente.
+function chooseAI(ai) {
+  const key = STEPS[step].key;
+  chosenAI = ai;
+  STEPS = buildSteps(ai);
+  buildProgress();
+  document.querySelectorAll('#aiPicker button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ai === ai)));
+  const same = STEPS.findIndex(s => s.key === key);
+  showStep(same >= 0 ? same : STEPS.findIndex(s => s.key === 'ai'));
+}
+
+function showStep(i) {
+  step = Math.max(0, Math.min(STEPS.length - 1, i));
+  closePanel(false);
+  const s = STEPS[step];
+  document.getElementById('stepTag').textContent = step === 0 ? 'Diagrama de clases' : `Paso ${step} de ${STEPS.length - 1}`;
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepBody').innerHTML = s.body;
+  [...progress.children].forEach((dot, k) => dot.classList.toggle('on', k === step));
+  document.getElementById('prev').disabled = step === 0;
+  document.getElementById('next').disabled = step === STEPS.length - 1;
+  document.getElementById('next').textContent = step === 0 ? 'Recorrer una partida ›' : 'Siguiente ›';
+  focus(s.all ? { all: true } : s);
+}
+
+/* ---------- panel de clase ---------- */
+const panel = document.getElementById('panel');
+const panelBody = document.getElementById('panelBody');
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function item(who, send, ret) {
+  return `<li><span class="who">${esc(who)}</span>: <code>${esc(send)}</code>` +
+    (ret ? `<span class="ret-txt">devuelve: ${esc(ret)}</span>` : '') + '</li>';
+}
+function list(items) {
+  return items.length ? `<ul>${items.join('')}</ul>` : '<ul><li class="none">Nadie.</li></ul>';
+}
+
+function selectClass(id) {
+  selected = id;
+  const c = CLASSES[id];
+  const incoming = FLOWS.filter(f => f.to === id).map(f => item(f.from, f.send, f.ret))
+    .concat((c.inExtra || []).map(x => item(...x)));
+  const outgoing = FLOWS.filter(f => f.from === id).map(f => item(f.to, f.send, f.ret))
+    .concat((c.outExtra || []).map(x => item(...x)));
+  const parents = STRUCTS.filter(s => s.from === id && s.kind !== 'uses')
+    .map(s => `<li>${s.kind === 'realize' ? 'Implementa' : 'Hereda de'} <span class="who">${s.to}</span></li>`);
+  const children = STRUCTS.filter(s => s.to === id && s.kind !== 'uses')
+    .map(s => `<li><span class="who">${s.from}</span> ${s.kind === 'realize' ? 'la implementa' : 'hereda de esta clase'}</li>`);
+  const family = parents.concat(children);
+
+  panelBody.innerHTML = `
+    <div class="kind">${c.kind}</div>
+    <h2>${id}</h2>
+    <div class="file mono">${c.file}</div>
+    <p class="desc">${c.desc}</p>
+    <h3>Qué recibe al crearse</h3>
+    <ul><li>${esc(c.ctor)}</li></ul>
+    <h3>Qué le piden (y qué devuelve)</h3>
+    ${list(incoming)}
+    <h3>Qué les pide a otras clases</h3>
+    ${list(outgoing)}
+    ${family.length ? `<h3>Herencia e interfaces</h3><ul>${family.join('')}</ul>` : ''}`;
+  panel.classList.add('open');
+
+  const flows = FLOWS.filter(f => f.from === id || f.to === id);
+  const structs = STRUCTS.filter(s => s.from === id || s.to === id);
+  const classes = [...new Set([id, ...flows.flatMap(f => [f.from, f.to]), ...structs.flatMap(s => [s.from, s.to])])];
+  focus({ classes, flows: flows.map(f => f.id), structs: structs.map(s => s.id), sel: id });
+}
+
+function closePanel(restore = true) {
+  panel.classList.remove('open');
+  selected = null;
+  if (restore) showStep(step);
+}
+
+/* ---------- controles ---------- */
+document.getElementById('prev').addEventListener('click', () => showStep(step - 1));
+document.getElementById('next').addEventListener('click', () => showStep(step + 1));
+document.getElementById('overview').addEventListener('click', () => showStep(0));
+document.getElementById('closePanel').addEventListener('click', () => closePanel());
+document.querySelectorAll('#aiPicker button').forEach(b => b.addEventListener('click', () => chooseAI(b.dataset.ai)));
+document.getElementById('fullscreen').addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen?.();
+});
+document.addEventListener('keydown', e => {
+  const onControl = e.target.closest && e.target.closest('button, [role="button"]');
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || (e.key === ' ' && !onControl)) { e.preventDefault(); showStep(step + 1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); showStep(step - 1); }
+  else if (e.key === 'Escape') { selected ? closePanel() : showStep(0); }
+  else if (e.key === 'f' || e.key === 'F') { document.getElementById('fullscreen').click(); }
+  else if (['1', '2', '3'].includes(e.key)) { chooseAI(Object.keys(AI_OPTIONS)[Number(e.key) - 1]); }
+});
+svg.addEventListener('click', e => { if (e.target === svg && selected) closePanel(); });
+
+showStep(0);
+</script>
+</body>
+</html>
