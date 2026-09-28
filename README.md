@@ -4,9 +4,9 @@ Juego por turnos tipo piedra, papel o tijera, hecho en C# para el Trabajo Práct
 
 Un jugador humano se enfrenta a una inteligencia artificial. Cada uno recibe 5 elementos al azar (Agua, Tierra o Fuego) con 100% de energía, y en cada ronda los elementos se atacan según una tabla de daño configurable. Gana quien deja al rival sin elementos en pie.
 
-## Video
 
-<!-- Pegar acá el link del video subido desde github.com (arrastrando el .mp4 al editor del README). -->
+https://github.com/user-attachments/assets/d2147f9d-f412-4eaf-972c-2d1fbe583f72
+
 
 ## Cómo ejecutarlo
 
