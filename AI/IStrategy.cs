@@ -1,6 +1,6 @@
-using ElementalGame.Models;
+using tp1Paradigmas.Models;
 
-namespace ElementalGame.AI;
+namespace tp1Paradigmas.AI;
 
 // [Abstracción] Interfaz: define QUÉ tiene que saber hacer toda IA (elegir una unidad), no CÓMO.
 // [Polimorfismo] Cualquier clase que la implemente puede ser usada indistintamente por AIPlayer.
