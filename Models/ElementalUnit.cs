@@ -1,13 +1,9 @@
 namespace tp1Paradigmas.Models;
 
-// [Abstracción] Representa la idea general de una unidad de combate. Es abstracta, así que no se
-// puede instanciar directamente: solo existen unidades concretas (como Pokemon).
 public abstract class ElementalUnit
 {
     public const double MaxEnergy = 100.0;
 
-    // [Encapsulamiento] Solo lectura desde afuera. Energy tiene setter privado: nadie puede asignarla
-    // directamente, solo cambia con TakeDamage(), que garantiza que nunca baje de 0.
     public int Id { get; }
     public ElementType Type { get; }
     public double Energy { get; private set; }
@@ -20,8 +16,6 @@ public abstract class ElementalUnit
         Energy = MaxEnergy;
     }
 
-    // Ataca al defensor según la tabla y devuelve cuánta energía le sacó realmente.
-    // [Abstracción] Quien llama a Attack() no necesita saber cómo se calcula el daño.
     public double Attack(ElementalUnit defender, EffectivenessTable table)
     {
         double energyBefore = defender.Energy;

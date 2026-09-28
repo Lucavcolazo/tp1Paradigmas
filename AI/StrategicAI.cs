@@ -2,14 +2,10 @@ using tp1Paradigmas.Models;
 
 namespace tp1Paradigmas.AI;
 
-// Elige la unidad con mejor balance entre daño infligido y daño recibido frente al rival.
-// [Polimorfismo] Implementa IStrategy.
 public class StrategicAI : IStrategy
 {
-    // [Encapsulamiento] protected: oculto desde afuera, pero accesible para las subclases (SuperAI).
     protected EffectivenessTable Table { get; }
 
-    // [Polimorfismo] Miembros virtual: las subclases pueden redefinirlos.
     public virtual string Name => "IA Estratégica";
     public virtual string Description => "Busca la ventaja de tipo contra tu elemento";
 
@@ -28,7 +24,6 @@ public class StrategicAI : IStrategy
                 .First();
     }
 
-    // [Encapsulamiento] Helpers protected: SuperAI los reutiliza, pero no son parte de la API pública.
     protected double DamageDealt(ElementalUnit own, ElementalUnit rival) =>
         Table.GetDamage(own.Type, rival.Type);
 

@@ -6,9 +6,6 @@ namespace tp1Paradigmas.Game;
 
 public class Match
 {
-    // [Polimorfismo] Los dos se declaran como Player: la partida no distingue entre humano
-    // e IA, solo le pide a cada uno que prepare su unidad y ataque.
-    // [Encapsulamiento] Todo el estado es private y readonly.
     private readonly Player human;
     private readonly Player ai;
     private readonly EffectivenessTable table;
@@ -43,8 +40,6 @@ public class Match
         screen.ShowResult(winner, winner == human, roundNumber);
     }
 
-    // El humano ataca primero. Si la unidad de la IA cae, la reemplaza y el reemplazo contraataca.
-    // Al final muestra un resumen; los equipos completos solo cuando alguien quedó fuera de combate.
     private void PlayRound()
     {
         PrepareUnit(human, ai);

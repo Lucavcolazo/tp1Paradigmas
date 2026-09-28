@@ -3,12 +3,8 @@ using tp1Paradigmas.Models;
 
 namespace tp1Paradigmas.Setup;
 
-// Conoce los tipos de IA disponibles: el jugador elige uno o deja que se sortee.
 public class StrategySelector
 {
-    // [Polimorfismo] Una sola lista de IStrategy guarda tres tipos distintos de IA,
-    // y todas se tratan de la misma forma.
-    // [Encapsulamiento] La lista es privada y se expone de solo lectura.
     private readonly List<IStrategy> strategies;
 
     public IReadOnlyList<IStrategy> Strategies => strategies.AsReadOnly();
