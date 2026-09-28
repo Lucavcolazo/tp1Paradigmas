@@ -1,11 +1,11 @@
 namespace ElementalGame.Models;
 
-// Configurable damage matrix: changing the rules does not affect the game logic.
-// [Abstraction] The rest of the game only asks "how much damage does X do to Y?" through GetDamage(),
-// without knowing how the rules are stored. This is what avoids if/switch chains between types.
+// Matriz de daño configurable: cambiar las reglas no afecta la lógica del juego.
+// [Abstracción] El resto del juego solo pregunta "¿cuánto daño le hace X a Y?" con GetDamage(),
+// sin saber cómo se guardan las reglas. Esto es lo que evita cadenas de if/switch entre tipos.
 public class EffectivenessTable
 {
-    // [Encapsulation] The dictionary is private: rules can only be added or queried through the public methods.
+    // [Encapsulamiento] El diccionario es privado: las reglas solo se agregan o consultan con los métodos públicos.
     private readonly Dictionary<(ElementType Attacker, ElementType Defender), double> damages = new();
 
     public static EffectivenessTable CreateDefault()
@@ -18,7 +18,7 @@ public class EffectivenessTable
         table.AddRule(ElementType.Earth, ElementType.Water, 50.0);
         table.AddRule(ElementType.Water, ElementType.Earth, 20.0);
 
-        // Same-type matchups: even damage so the round keeps moving.
+        // Enfrentamientos entre el mismo tipo: daño parejo para que la ronda avance.
         table.AddRule(ElementType.Water, ElementType.Water, 15.0);
         table.AddRule(ElementType.Earth, ElementType.Earth, 15.0);
         table.AddRule(ElementType.Fire, ElementType.Fire, 15.0);

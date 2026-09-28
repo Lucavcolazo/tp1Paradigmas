@@ -1,14 +1,13 @@
 namespace ElementalGame.Models;
 
-// [Abstraction] Represents the general idea of a combat unit. It is abstract, so it cannot be
-// instantiated directly: only concrete units (like Pokemon) can exist.
+// [Abstracción] Representa la idea general de una unidad de combate. Es abstracta, así que no se
+// puede instanciar directamente: solo existen unidades concretas (como Pokemon).
 public abstract class ElementalUnit
 {
     public const double MaxEnergy = 100.0;
 
-    // [Encapsulation] Read-only from outside. Energy has a private setter: nobody can assign it
-    // directly, it only changes through TakeDamage(), which guarantees it never drops below 0.
-
+    // [Encapsulamiento] Solo lectura desde afuera. Energy tiene setter privado: nadie puede asignarla
+    // directamente, solo cambia con TakeDamage(), que garantiza que nunca baje de 0.
     public int Id { get; }
     public ElementType Type { get; }
     public double Energy { get; private set; }
@@ -21,8 +20,8 @@ public abstract class ElementalUnit
         Energy = MaxEnergy;
     }
 
-    // Attacks the defender according to the table and returns how much energy it actually removed.
-    // [Abstraction] Whoever calls Attack() doesn't need to know how the damage is calculated.
+    // Ataca al defensor según la tabla y devuelve cuánta energía le sacó realmente.
+    // [Abstracción] Quien llama a Attack() no necesita saber cómo se calcula el daño.
     public double Attack(ElementalUnit defender, EffectivenessTable table)
     {
         double energyBefore = defender.Energy;

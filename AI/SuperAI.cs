@@ -2,14 +2,14 @@ using ElementalGame.Models;
 
 namespace ElementalGame.AI;
 
-// Strategy + efficiency: if some unit can finish off the rival in one hit, it uses the one that
-// does it with the least advantage and energy, saving the best ones for later.
-// If none can finish it off, it behaves like the strategic AI.
-// [Inheritance] SuperAI is a StrategicAI "with something extra": it reuses the table and
-// DamageDealt() without duplicating code.
+// Estrategia + eficiencia: si alguna unidad puede rematar al rival de un golpe, usa la que
+// lo logra con menos ventaja y menos energía, guardando las mejores para después.
+// Si ninguna lo remata, se comporta como la IA estratégica.
+// [Herencia] SuperAI es una StrategicAI "con algo más": reutiliza la tabla y
+// DamageDealt() sin duplicar código.
 public class SuperAI : StrategicAI
 {
-    // [Polymorphism] Overrides the name and description of the base class.
+    // [Polimorfismo] Sobrescribe el nombre y la descripción de la clase base.
     public override string Name => "Super IA";
     public override string Description => "Ventaja de tipo + te remata con lo justo";
 
@@ -17,8 +17,8 @@ public class SuperAI : StrategicAI
     {
     }
 
-    // [Polymorphism] Overrides Choose(), and when it cannot finish off the rival it falls back
-    // to the parent's behavior with base.Choose().
+    // [Polimorfismo] Sobrescribe Choose(), y cuando no puede rematar al rival vuelve
+    // al comportamiento del padre con base.Choose().
     public override ElementalUnit Choose(IReadOnlyList<ElementalUnit> available, ElementalUnit? rival)
     {
         var finisher = rival is null

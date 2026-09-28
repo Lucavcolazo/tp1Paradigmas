@@ -3,12 +3,12 @@ using ElementalGame.Models;
 
 namespace ElementalGame.Setup;
 
-// Knows the available AI types: the player picks one or lets it be drawn at random.
+// Conoce los tipos de IA disponibles: el jugador elige uno o deja que se sortee.
 public class StrategySelector
 {
-    // [Polymorphism] A single list of IStrategy holds three different types of AI,
-    // and they are all treated the same way.
-    // [Encapsulation] The list is private and exposed read-only.
+    // [Polimorfismo] Una sola lista de IStrategy guarda tres tipos distintos de IA,
+    // y todas se tratan de la misma forma.
+    // [Encapsulamiento] La lista es privada y se expone de solo lectura.
     private readonly List<IStrategy> strategies;
 
     public IReadOnlyList<IStrategy> Strategies => strategies.AsReadOnly();

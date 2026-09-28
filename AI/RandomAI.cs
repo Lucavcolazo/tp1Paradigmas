@@ -2,9 +2,9 @@ using ElementalGame.Models;
 
 namespace ElementalGame.AI;
 
-// Picks at random, without looking at the rival.
-// [Polymorphism] Implements IStrategy directly: it shares no logic with the other AIs,
-// so it doesn't inherit from any of them.
+// Elige al azar, sin mirar al rival.
+// [Polimorfismo] Implementa IStrategy directamente: no comparte lógica con las otras IAs,
+// por eso no hereda de ninguna.
 public class RandomAI : IStrategy
 {
     public string Name => "IA Aleatoria";

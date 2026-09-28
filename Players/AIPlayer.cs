@@ -3,11 +3,11 @@ using ElementalGame.Models;
 
 namespace ElementalGame.Players;
 
-// [Inheritance] AIPlayer is a Player, just like HumanPlayer.
+// [Herencia] AIPlayer es un Player, igual que HumanPlayer.
 public class AIPlayer : Player
 {
-    // [Polymorphism] It depends on the IStrategy interface, not on a concrete AI: any strategy
-    // (random, strategic, super) can be plugged in without changing this class (Strategy pattern).
+    // [Polimorfismo] Depende de la interfaz IStrategy, no de una IA concreta: cualquier estrategia
+    // (aleatoria, estratégica, súper) se puede enchufar sin cambiar esta clase (patrón Strategy).
     private readonly IStrategy strategy;
 
     public AIPlayer(IStrategy strategy, IEnumerable<ElementalUnit> units)
@@ -16,7 +16,7 @@ public class AIPlayer : Player
         this.strategy = strategy;
     }
 
-    // [Polymorphism] Override: the AI delegates the choice to its strategy.
+    // [Polimorfismo] Override: la IA delega la elección en su estrategia.
     protected override ElementalUnit ChooseUnit(IReadOnlyList<ElementalUnit> available, ElementalUnit? rival)
     {
         return strategy.Choose(available, rival);

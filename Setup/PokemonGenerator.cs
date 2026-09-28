@@ -5,11 +5,11 @@ namespace ElementalGame.Setup;
 public class PokemonGenerator
 {
     private static readonly ElementType[] Types = Enum.GetValues<ElementType>();
-    // [Encapsulation] The id counter is internal state that only the generator manages.
+    // [Encapsulamiento] El contador de ids es estado interno que solo maneja el generador.
     private int lastId;
 
-    // [Polymorphism] Returns ElementalUnit (the base type), not Pokemon: the rest of the game
-    // works with the abstraction and doesn't depend on the concrete class.
+    // [Polimorfismo] Devuelve ElementalUnit (el tipo base), no Pokemon: el resto del juego
+    // trabaja con la abstracción y no depende de la clase concreta.
     public List<ElementalUnit> Generate(int count)
     {
         var pokemons = new List<ElementalUnit>();

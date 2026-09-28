@@ -2,14 +2,14 @@ using ElementalGame.Models;
 
 namespace ElementalGame.AI;
 
-// Picks the unit with the best balance between damage dealt and damage taken against the rival.
-// [Polymorphism] Implements IStrategy.
+// Elige la unidad con mejor balance entre daño infligido y daño recibido frente al rival.
+// [Polimorfismo] Implementa IStrategy.
 public class StrategicAI : IStrategy
 {
-    // [Encapsulation] protected: hidden from the outside, but accessible to subclasses (SuperAI).
+    // [Encapsulamiento] protected: oculto desde afuera, pero accesible para las subclases (SuperAI).
     protected EffectivenessTable Table { get; }
 
-    // [Polymorphism] virtual members: subclasses can redefine them.
+    // [Polimorfismo] Miembros virtual: las subclases pueden redefinirlos.
     public virtual string Name => "IA Estratégica";
     public virtual string Description => "Busca la ventaja de tipo contra tu elemento";
 
@@ -28,7 +28,7 @@ public class StrategicAI : IStrategy
                 .First();
     }
 
-    // [Encapsulation] protected helpers: SuperAI reuses them, but they are not part of the public API.
+    // [Encapsulamiento] Helpers protected: SuperAI los reutiliza, pero no son parte de la API pública.
     protected double DamageDealt(ElementalUnit own, ElementalUnit rival) =>
         Table.GetDamage(own.Type, rival.Type);
 

@@ -6,10 +6,10 @@ using ElementalGame.Setup;
 
 namespace ElementalGame.UI;
 
-// Everything shown in the terminal (and everything read from the human) goes through here.
-// Player-facing text is in Spanish.
-// [Encapsulation] Only exposes "show X" / "ask for Y" methods; colors, styles and drawing helpers
-// are private. The model classes never write to the console.
+// Todo lo que se muestra en la terminal (y lo que se lee del humano) pasa por acá.
+// Los textos que ve el jugador están en español.
+// [Encapsulamiento] Solo expone métodos "mostrar X" / "pedir Y"; los colores, estilos y helpers de dibujo
+// son privados. Las clases del modelo nunca escriben en la consola.
 public class Screen
 {
     private const int BoxWidth = 44;
@@ -38,7 +38,7 @@ public class Screen
         (0, ConsoleColor.DarkGray)
     };
 
-    // Indexed by the sign of (damage dealt - damage taken) in the round.
+    // Indexado por el signo de (daño infligido - daño recibido) en la ronda.
     private static readonly Dictionary<int, (string Text, ConsoleColor Color)> Exchanges = new()
     {
         [1] = ("Ganaste el intercambio", ConsoleColor.Green),
@@ -70,7 +70,7 @@ public class Screen
         Write($"  ╚{new string('═', BoxWidth)}╝\n", ConsoleColor.DarkYellow);
     }
 
-    // Rival menu, with one extra option at the end to draw it at random.
+    // Menú de rivales, con una opción extra al final para sortearlo.
     public IStrategy AskForStrategy(StrategySelector selector)
     {
         var strategies = selector.Strategies;

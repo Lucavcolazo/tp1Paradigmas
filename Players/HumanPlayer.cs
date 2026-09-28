@@ -3,7 +3,7 @@ using ElementalGame.UI;
 
 namespace ElementalGame.Players;
 
-// [Inheritance] HumanPlayer is a Player: it reuses all of its logic and only defines how it chooses.
+// [Herencia] HumanPlayer es un Player: reutiliza toda su lógica y solo define cómo elige.
 public class HumanPlayer : Player
 {
     private readonly Screen screen;
@@ -14,7 +14,7 @@ public class HumanPlayer : Player
         this.screen = screen;
     }
 
-    // [Polymorphism] Override: the human chooses by asking through the screen.
+    // [Polimorfismo] Override: el humano elige preguntando por pantalla.
     protected override ElementalUnit ChooseUnit(IReadOnlyList<ElementalUnit> available, ElementalUnit? rival)
     {
         return screen.AskForUnit(available, rival);

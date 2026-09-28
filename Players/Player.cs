@@ -2,17 +2,17 @@ using ElementalGame.Models;
 
 namespace ElementalGame.Players;
 
-// [Abstraction] Models what every player has in common (units, active unit, replacing a fallen one)
-// and leaves abstract the only thing that changes: how each one chooses its unit.
+// [Abstracción] Modela lo que todo jugador tiene en común (unidades, unidad activa, reemplazar a la caída)
+// y deja abstracto lo único que cambia: cómo elige cada uno su unidad.
 public abstract class Player
 {
-    // [Encapsulation] The list is private and exposed only as read-only views (Units, AliveUnits),
-    // so nobody from outside can add or remove units.
+    // [Encapsulamiento] La lista es privada y se expone solo como vistas de solo lectura (Units, AliveUnits),
+    // así nadie desde afuera puede agregar o quitar unidades.
     private readonly List<ElementalUnit> units;
 
     public string Name { get; }
 
-    // [Encapsulation] Private setter: only the player itself decides which unit is active.
+    // [Encapsulamiento] Setter privado: solo el propio jugador decide qué unidad está activa.
     public ElementalUnit? ActiveUnit { get; private set; }
 
     public IReadOnlyList<ElementalUnit> Units => units.AsReadOnly();
@@ -27,9 +27,9 @@ public abstract class Player
         this.units = units.ToList();
     }
 
-    // If the active unit was knocked out (or there is none yet), picks a replacement among the alive ones.
-    // [Polymorphism] Calls ChooseUnit() without knowing whether it is a human or an AI: at runtime
-    // the version of the actual subclass runs (template method).
+    // Si la unidad activa quedó fuera de combate (o todavía no hay una), elige un reemplazo entre las vivas.
+    // [Polimorfismo] Llama a ChooseUnit() sin saber si es un humano o una IA: en tiempo de ejecución
+    // se ejecuta la versión de la subclase real (template method).
     public void PrepareUnit(ElementalUnit? rival)
     {
         if (NeedsUnit && HasAliveUnits)
@@ -38,6 +38,6 @@ public abstract class Player
         }
     }
 
-    // [Abstraction] Abstract method: each subclass is forced to define how it chooses.
+    // [Abstracción] Método abstracto: obliga a cada subclase a definir cómo elige.
     protected abstract ElementalUnit ChooseUnit(IReadOnlyList<ElementalUnit> available, ElementalUnit? rival);
 }
